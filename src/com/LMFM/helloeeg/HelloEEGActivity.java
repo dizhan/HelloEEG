@@ -1,5 +1,7 @@
 package com.LMFM.helloeeg;
 
+import java.util.Set;
+
 import android.os.Bundle;
 
 import android.app.Activity;
@@ -9,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,19 +21,23 @@ import android.view.Menu;
 
 
 import com.neurosky.thinkgear.*;
-import com.neurosky.thinkgear.TGDevice;
 import com.LMFM.helloeeg.R;
 
 import android.bluetooth.*;
+import android.content.Intent;
 //import android.bluethooth.BluetoothAdapter;
 //import android.bluethooth.BluetoothDevice;
 
 
 
 public class HelloEEGActivity extends Activity {
+	private static final int REQUEST_ENABLE_BT = 1;
+
 	BluetoothAdapter bluetoothAdapter;
 	
 	TextView tv;
+	TextView AttentionMes;
+	TextView MediationMes;
 	Button b;
 	
 	TGDevice tgDevice;
@@ -42,7 +49,17 @@ public class HelloEEGActivity extends Activity {
         tv = (TextView)findViewById(R.id.textView1);
         tv.setText("");
         tv.append("Android version: " + Integer.valueOf(android.os.Build.VERSION.SDK) + "\n" );
+        
+        AttentionMes = (TextView)findViewById(R.id.textView2);
+        AttentionMes.setText("Attention\n");
+        
+        MediationMes = (TextView)findViewById(R.id.textView3);
+        MediationMes.setText("Mediation\n");   
+        
+        
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //String bluetoothname = bluetoothAdapter.getName();
+        
 
         
         if(bluetoothAdapter == null) {
@@ -51,9 +68,24 @@ public class HelloEEGActivity extends Activity {
         	finish();
         	return;
         }else {
+        	/*if (bluetoothAdapter.isEnabled()) {
+        	    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        	    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        	}*/
         	/* create the TGDevice */
+        	/*ArrayAdapter mArrayAdapter = null;
+        	Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        	if (pairedDevices.size()>0){
+        		for (BluetoothDevice device : pairedDevices){
+        			mArrayAdapter.add(device.getName() +"\n"+device.getAddress());
+        		}
+        	}*/
         	tgDevice = new TGDevice(bluetoothAdapter, handler);
-        	Toast.makeText(this, "the device is developed", Toast.LENGTH_LONG).show();
+        	/*if (tgDevice == null){
+        		tv.append("there ");
+        	}*/
+        	tgDevice.connect(true);
+        	tgDevice.start();
         	
    
         }  
@@ -72,7 +104,7 @@ public class HelloEEGActivity extends Activity {
         public void handleMessage(Message msg) {
         	switch (msg.what) {
             case TGDevice.MSG_STATE_CHANGE:
-
+            	tv.append("get message");
                 switch (msg.arg1) {
 	                case TGDevice.STATE_IDLE:
 	                    break;
@@ -96,25 +128,26 @@ public class HelloEEGActivity extends Activity {
                 break;
             case TGDevice.MSG_POOR_SIGNAL:
             		//signal = msg.arg1;
-            		tv.append("PoorSignal: " + msg.arg1 + "\n");
+            		//tv.append("PoorSignal: " + msg.arg1 + "\n");
                 break;
             case TGDevice.MSG_RAW_DATA:	  
             		//raw1 = msg.arg1;
             		//tv.append("Got raw: " + msg.arg1 + "\n");
             	break;
             case TGDevice.MSG_HEART_RATE:
-        		tv.append("Heart rate: " + msg.arg1 + "\n");
+        		//tv.append("Heart rate: " + msg.arg1 + "\n");
                 break;
             case TGDevice.MSG_ATTENTION:
-            		//att = msg.arg1;
-            		tv.append("Attention: " + msg.arg1 + "\n");
-            		//Log.v("HelloA", "Attention: " + att + "\n");
+            		int att = msg.arg1;
+            		AttentionMes.append("Attention: " + msg.arg1 + "\n");
+            		Log.v("HelloA", "Attention: " + att + "\n");
             	break;
             case TGDevice.MSG_MEDITATION:
-
+            	int Med = msg.arg1;
+            	MediationMes.append("Meditation: "+msg.arg1+ "\n");
             	break;
             case TGDevice.MSG_BLINK:
-            		tv.append("Blink: " + msg.arg1 + "\n");
+            		//tv.append("Blink: " + msg.arg1 + "\n");
             	break;
             case TGDevice.MSG_RAW_COUNT:
             		//tv.append("Raw Count: " + msg.arg1 + "\n");
