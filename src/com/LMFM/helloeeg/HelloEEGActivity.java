@@ -1,5 +1,8 @@
 package com.LMFM.helloeeg;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Set;
 
 import android.os.Bundle;
@@ -24,6 +27,7 @@ import com.neurosky.thinkgear.*;
 import com.LMFM.helloeeg.R;
 
 import android.bluetooth.*;
+import android.content.Context;
 import android.content.Intent;
 //import android.bluethooth.BluetoothAdapter;
 //import android.bluethooth.BluetoothDevice;
@@ -93,6 +97,7 @@ public class HelloEEGActivity extends Activity {
     
     @Override
     public void onDestroy() {
+    	
     	tgDevice.close();
         super.onDestroy();
     }
@@ -123,6 +128,7 @@ public class HelloEEGActivity extends Activity {
 	                	break;
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
+	                	save(AttentionMes.getText().toString());
                 }
 
                 break;
@@ -168,5 +174,21 @@ public class HelloEEGActivity extends Activity {
     	if(tgDevice.getState() != TGDevice.STATE_CONNECTING && tgDevice.getState() != TGDevice.STATE_CONNECTED)
     		tgDevice.connect(rawEnabled);   
     	//tgDevice.ena
+    }
+    public void save(String A)
+    {
+        try {
+            FileOutputStream outStream=openFileOutput("helloEEG.txt",Context.MODE_WORLD_READABLE+Context.MODE_WORLD_WRITEABLE);
+            outStream.write(A.getBytes());
+            
+            //outStream.write(B.toString().getBytes());
+            outStream.close();
+            Toast.makeText(this,"Saved",Toast.LENGTH_LONG).show();
+        } catch (FileNotFoundException e) {
+            return;
+        }
+        catch (IOException e){
+            return ;
+        }
     }
 }
