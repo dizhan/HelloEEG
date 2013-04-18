@@ -1,5 +1,7 @@
 package com.LMFM.helloeeg;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -131,6 +133,7 @@ public class HelloEEGActivity extends Activity {
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
 	                	save(AttentionMes.getText().toString());
+	                	load();
 	                    System.out.println(getFilesDir());
                 }
 
@@ -148,12 +151,12 @@ public class HelloEEGActivity extends Activity {
                 break;
             case TGDevice.MSG_ATTENTION:
             		int att = msg.arg1;
-            		AttentionMes.append("Attention: " + msg.arg1 + "\n");
+            		AttentionMes.append(msg.arg1 + "\n");
             		Log.v("HelloA", "Attention: " + att + "\n");
             	break;
             case TGDevice.MSG_MEDITATION:
             	int Med = msg.arg1;
-            	MediationMes.append("Meditation: "+msg.arg1+ "\n");
+            	MediationMes.append(msg.arg1+ "\n");
             	break;
             case TGDevice.MSG_BLINK:
             		//tv.append("Blink: " + msg.arg1 + "\n");
@@ -189,6 +192,33 @@ public class HelloEEGActivity extends Activity {
             Toast.makeText(this,"Saved",Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             return;
+        }
+        catch (IOException e){
+            return ;
+        }
+    }
+    
+    public void load()
+    {
+        try {
+            FileInputStream inStream=this.openFileInput("helloEEG.txt");
+            ByteArrayOutputStream stream=new ByteArrayOutputStream();
+            byte[] buffer=new byte[1024];
+            int length=-1;
+            while((length=inStream.read(buffer))!=-1)   {
+                stream.write(buffer,0,length);
+            }
+            stream.close();
+            inStream.close();
+            
+            if (stream == null){
+            }
+            else{
+            AttentionMes.setText(stream.toString());
+            Toast.makeText(this,"Loaded",Toast.LENGTH_LONG).show();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
         catch (IOException e){
             return ;
