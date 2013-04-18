@@ -7,6 +7,7 @@ import java.util.Set;
 
 import android.os.Bundle;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import android.content.Intent;
 
 
 
+@SuppressLint({ "WorldWriteableFiles", "WorldReadableFiles" })
 public class HelloEEGActivity extends Activity {
 	private static final int REQUEST_ENABLE_BT = 1;
 
@@ -129,6 +131,7 @@ public class HelloEEGActivity extends Activity {
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
 	                	save(AttentionMes.getText().toString());
+	                    System.out.println(getFilesDir());
                 }
 
                 break;
@@ -178,7 +181,7 @@ public class HelloEEGActivity extends Activity {
     public void save(String A)
     {
         try {
-            FileOutputStream outStream=openFileOutput("helloEEG.txt",Context.MODE_WORLD_READABLE+Context.MODE_WORLD_WRITEABLE);
+            FileOutputStream outStream=openFileOutput("helloEEG.txt",2);
             outStream.write(A.getBytes());
             
             //outStream.write(B.toString().getBytes());
