@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +49,7 @@ public class HelloEEGActivity extends Activity {
 	TextView AttentionMes;
 	TextView MediationMes;
 	Button b;
+	EditText fileName;
 	
 	TGDevice tgDevice;
 	final boolean rawEnabled = false;
@@ -58,6 +60,9 @@ public class HelloEEGActivity extends Activity {
         tv = (TextView)findViewById(R.id.textView1);
         tv.setText("");
         tv.append("Android version: " + Integer.valueOf(android.os.Build.VERSION.SDK) + "\n" );
+        
+        fileName = (EditText)findViewById(R.id.editText1);
+        //fileName.getText();
         
         AttentionMes = (TextView)findViewById(R.id.textView3);
         AttentionMes.setText("");
@@ -133,7 +138,7 @@ public class HelloEEGActivity extends Activity {
 	                	break;
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
-	                	save(AttentionMes.getText().toString(), MediationMes.getText().toString());
+	                	save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
 	                	
 	                
 	                    System.out.println(getFilesDir());
@@ -183,11 +188,11 @@ public class HelloEEGActivity extends Activity {
     		tgDevice.connect(rawEnabled);   
     	//tgDevice.ena
     }
-    public void save(String A, String B)
+    public void save(String A, String B, String x)
     {
         try {
             
-			FileOutputStream outStream=openFileOutput("helloEEG.txt",Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
+			FileOutputStream outStream=openFileOutput(x,Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
             outStream.write(A.getBytes());
 
             outStream.write(B.getBytes());
