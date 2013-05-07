@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+
 import android.view.Menu;
 
 
@@ -58,11 +59,11 @@ public class HelloEEGActivity extends Activity {
         tv.setText("");
         tv.append("Android version: " + Integer.valueOf(android.os.Build.VERSION.SDK) + "\n" );
         
-        AttentionMes = (TextView)findViewById(R.id.textView2);
-        AttentionMes.setText("Attention\n");
+        AttentionMes = (TextView)findViewById(R.id.textView3);
+        AttentionMes.setText("");
         
-        MediationMes = (TextView)findViewById(R.id.textView3);
-        MediationMes.setText("Mediation\n");   
+        MediationMes = (TextView)findViewById(R.id.textView5);
+        MediationMes.setText("");   
         
         
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -132,8 +133,9 @@ public class HelloEEGActivity extends Activity {
 	                	break;
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
-	                	save(AttentionMes.getText().toString());
-	                	load();
+	                	save(AttentionMes.getText().toString(), MediationMes.getText().toString());
+	                	
+	                
 	                    System.out.println(getFilesDir());
                 }
 
@@ -151,12 +153,12 @@ public class HelloEEGActivity extends Activity {
                 break;
             case TGDevice.MSG_ATTENTION:
             		int att = msg.arg1;
-            		AttentionMes.append(msg.arg1 + "\n");
-            		Log.v("HelloA", "Attention: " + att + "\n");
+            		AttentionMes.append(msg.arg1+ " ");
+            		//Log.v("HelloA", "Attention: " + att + "\n");
             	break;
             case TGDevice.MSG_MEDITATION:
             	int Med = msg.arg1;
-            	MediationMes.append(msg.arg1+ "\n");
+            	MediationMes.append(msg.arg1+ " ");
             	break;
             case TGDevice.MSG_BLINK:
             		//tv.append("Blink: " + msg.arg1 + "\n");
@@ -181,11 +183,14 @@ public class HelloEEGActivity extends Activity {
     		tgDevice.connect(rawEnabled);   
     	//tgDevice.ena
     }
-    public void save(String A)
+    public void save(String A, String B)
     {
         try {
-            FileOutputStream outStream=openFileOutput("helloEEG.txt",2);
+            
+			FileOutputStream outStream=openFileOutput("helloEEG.txt",Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
             outStream.write(A.getBytes());
+
+            outStream.write(B.getBytes());
             
             //outStream.write(B.toString().getBytes());
             outStream.close();
@@ -198,30 +203,6 @@ public class HelloEEGActivity extends Activity {
         }
     }
     
-    public void load()
-    {
-        try {
-            FileInputStream inStream=this.openFileInput("helloEEG.txt");
-            ByteArrayOutputStream stream=new ByteArrayOutputStream();
-            byte[] buffer=new byte[1024];
-            int length=-1;
-            while((length=inStream.read(buffer))!=-1)   {
-                stream.write(buffer,0,length);
-            }
-            stream.close();
-            inStream.close();
-            
-            if (stream == null){
-            }
-            else{
-            AttentionMes.setText(stream.toString());
-            Toast.makeText(this,"Loaded",Toast.LENGTH_LONG).show();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e){
-            return ;
-        }
-    }
+ 
+
 }
