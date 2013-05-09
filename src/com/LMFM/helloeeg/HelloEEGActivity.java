@@ -54,6 +54,7 @@ public class HelloEEGActivity extends Activity {
 
 	TGDevice tgDevice;
 	final boolean rawEnabled = false;
+	Boolean playing = false;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +77,9 @@ public class HelloEEGActivity extends Activity {
         button1.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View v) {
         		//MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
+        		
         		mediaPlayer.start();
+        		playing = true;
         		
         	}
         });
@@ -84,8 +87,10 @@ public class HelloEEGActivity extends Activity {
         final Button button2 = (Button) findViewById(R.id.button2);
         button2.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View v) {
+        		playing = false;
         		mediaPlayer.pause();
-        		mediaPlayer.seekTo(0);
+        		//mediaPlayer.seekTo(0);
+        		save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
         	
         		
         	}
@@ -159,9 +164,7 @@ public class HelloEEGActivity extends Activity {
 	                	break;
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
-	                	save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
-
-
+	                	
 	                    System.out.println(getFilesDir());
                 }
 
@@ -179,12 +182,16 @@ public class HelloEEGActivity extends Activity {
                 break;
             case TGDevice.MSG_ATTENTION:
             		int att = msg.arg1;
+            		if (playing == true){
             		AttentionMes.append(msg.arg1+ " ");
+            		}
             		//Log.v("HelloA", "Attention: " + att + "\n");
             	break;
             case TGDevice.MSG_MEDITATION:
             	int Med = msg.arg1;
+            	if (playing ==true){
             	MediationMes.append(msg.arg1+ " ");
+            	}
             	break;
             case TGDevice.MSG_BLINK:
             		//tv.append("Blink: " + msg.arg1 + "\n");
@@ -209,6 +216,8 @@ public class HelloEEGActivity extends Activity {
     		tgDevice.connect(rawEnabled);   
     	//tgDevice.ena
     }
+    
+    // Save the data in text file
     public void save(String A, String B, String x)
     {
         try {
