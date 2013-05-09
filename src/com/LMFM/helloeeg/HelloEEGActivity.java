@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Set;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import android.annotation.SuppressLint;
@@ -44,13 +45,13 @@ public class HelloEEGActivity extends Activity {
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	BluetoothAdapter bluetoothAdapter;
-	
+
 	TextView tv;
 	TextView AttentionMes;
 	TextView MediationMes;
 	Button b;
 	EditText fileName;
-	
+
 	TGDevice tgDevice;
 	final boolean rawEnabled = false;
 
@@ -69,6 +70,17 @@ public class HelloEEGActivity extends Activity {
         
         MediationMes = (TextView)findViewById(R.id.textView5);
         MediationMes.setText("");   
+        
+        final Button button1 = (Button) findViewById(R.id.button1);
+        button1.setOnClickListener(new View.OnClickListener(){
+        	public void onClick(View v) {
+        		MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
+        		mediaPlayer.start();
+        		
+        	}
+        });
+        
+
         
         
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -139,8 +151,8 @@ public class HelloEEGActivity extends Activity {
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
 	                	save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
-	                	
-	                
+
+
 	                    System.out.println(getFilesDir());
                 }
 
