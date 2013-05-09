@@ -70,17 +70,26 @@ public class HelloEEGActivity extends Activity {
         
         MediationMes = (TextView)findViewById(R.id.textView5);
         MediationMes.setText("");   
+        final MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
         
         final Button button1 = (Button) findViewById(R.id.button1);
         button1.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View v) {
-        		MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
+        		//MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
         		mediaPlayer.start();
         		
         	}
         });
         
-
+        final Button button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener(){
+        	public void onClick(View v) {
+        		mediaPlayer.pause();
+        		mediaPlayer.seekTo(0);
+        	
+        		
+        	}
+        });
         
         
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
