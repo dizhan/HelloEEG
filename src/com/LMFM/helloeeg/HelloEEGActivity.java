@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import android.media.MediaPlayer;
@@ -45,16 +47,19 @@ public class HelloEEGActivity extends Activity {
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	BluetoothAdapter bluetoothAdapter;
-
 	TextView tv;
+	TextView rawData;
 	TextView AttentionMes;
 	TextView MediationMes;
 	Button b;
 	EditText fileName;
+	String rawDATA = "";
 
 	TGDevice tgDevice;
 	final boolean rawEnabled = false;
 	Boolean playing = false;
+	
+	//List list=new ArrayList();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +70,15 @@ public class HelloEEGActivity extends Activity {
         
         fileName = (EditText)findViewById(R.id.editText1);
         //fileName.getText();
+        rawData = (TextView)findViewById(R.id.textView8);
+        rawData.setText("");
         
         AttentionMes = (TextView)findViewById(R.id.textView3);
         AttentionMes.setText("");
         
         MediationMes = (TextView)findViewById(R.id.textView5);
         MediationMes.setText("");   
+        
         final MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
         
         final Button button1 = (Button) findViewById(R.id.button1);
@@ -90,8 +98,19 @@ public class HelloEEGActivity extends Activity {
         		playing = false;
         		mediaPlayer.pause();
         		//mediaPlayer.seekTo(0);
+        		
+            	
+        		//int size=list.size(); 
+            	//String[] Rawarray=new String[size]; 
+            	//for(int i=0;i<list.size();i++){ 
+            	//Rawarray[i]=(String)list.get(i); 
+           //} 
+            	
         		save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
-        	
+
+        		//save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString(),rawDATA.toString());
+
+
         		
         	}
         });
@@ -143,7 +162,8 @@ public class HelloEEGActivity extends Activity {
     private final Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-        	switch (msg.what) {
+        	int rawdata;
+			switch (msg.what) {
             case TGDevice.MSG_STATE_CHANGE:
             	tv.append("get message");
                 switch (msg.arg1) {
@@ -173,24 +193,34 @@ public class HelloEEGActivity extends Activity {
             		//signal = msg.arg1;
             		//tv.append("PoorSignal: " + msg.arg1 + "\n");
                 break;
+                
             case TGDevice.MSG_RAW_DATA:	  
-            		//raw1 = msg.arg1;
-            		//tv.append("Got raw: " + msg.arg1 + "\n");
+            	rawdata = msg.arg1;
+ 
+            	rawDATA = rawDATA.concat(msg.arg1+" ");
+
+            	//if (playing == true){
+            		//rawData.append(msg.arg1+" ");
+            	//}
             	break;
             case TGDevice.MSG_HEART_RATE:
         		//tv.append("Heart rate: " + msg.arg1 + "\n");
                 break;
             case TGDevice.MSG_ATTENTION:
             		int att = msg.arg1;
+            		
+            		//record the data, while the music is playing
+            	
             		if (playing == true){
-            		AttentionMes.append(msg.arg1+ " ");
+            		AttentionMes.append(att+ " ");
             		}
             		//Log.v("HelloA", "Attention: " + att + "\n");
             	break;
             case TGDevice.MSG_MEDITATION:
             	int Med = msg.arg1;
+            	//record the data, while the music is playing
             	if (playing ==true){
-            	MediationMes.append(msg.arg1+ " ");
+            	MediationMes.append(Med+ " ");
             	}
             	break;
             case TGDevice.MSG_BLINK:
@@ -218,14 +248,24 @@ public class HelloEEGActivity extends Activity {
     }
     
     // Save the data in text file
+    // public void save(String A, String B, String x, String r)
     public void save(String A, String B, String x)
     {
         try {
             
 			FileOutputStream outStream=openFileOutput(x,Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
-            outStream.write(A.getBytes());
+            
+			//save the data in one stream and the other stream
+			outStream.write(A.getBytes());
 
             outStream.write(B.getBytes());
+            
+          //  outStream.write(r.getBytes());
+           // int size=length(rawdata);  
+          //  for(int i=0;i<list.size();i++){ 
+           //     outStream.write(rawarray[i].getBytes());
+           // 	} 
+
             
             //outStream.write(B.toString().getBytes());
             outStream.close();
@@ -237,6 +277,8 @@ public class HelloEEGActivity extends Activity {
             return ;
         }
     }
+
+
     
  
 
