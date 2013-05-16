@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -61,7 +62,9 @@ public class HelloEEGActivity extends Activity {
 	TGDevice tgDevice;
 	final boolean rawEnabled = false;
 	Boolean playing = false;
-
+	
+	int[] AttArray = {44};
+	int[] MedArray;
 
 	//List list=new ArrayList();
 
@@ -116,7 +119,7 @@ public class HelloEEGActivity extends Activity {
         		save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
 
         		//save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString(),rawDATA.toString());
-        		//fileName.setText("Please type in the name of the File");
+        		fileName.setText("");
 
         		
         	}
@@ -129,7 +132,7 @@ public class HelloEEGActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-
+				button3.setEnabled(false);
 				if(bluetoothAdapter == null) {
 		        	// Alert user that Bluetooth is not available
 		        	//Toast.makeText(this, "Bluetooth not available", Toast.LENGTH_LONG).show();
@@ -156,8 +159,7 @@ public class HelloEEGActivity extends Activity {
 		        	tgDevice.start();
 		        	
 		   
-		        }
-				button3.setEnabled(false);
+		        }  
 			}
 		});
 
@@ -228,7 +230,7 @@ public class HelloEEGActivity extends Activity {
             	//rawDATA = rawDATA.concat(msg.arg1+" ");
 
             	//if (playing == true){
-            		//rawData.append(msg.arg1+" ");
+            		//rawData.append(msg.arg1+"");
             	//}
             	break;
             case TGDevice.MSG_HEART_RATE:
@@ -238,7 +240,8 @@ public class HelloEEGActivity extends Activity {
             		int att = msg.arg1;
             		if (playing == true){
             			//button1.setEnabled(true);
-            			AttentionMes.append(att+ " ");
+            			Arrays.fill(AttArray, att);
+            			AttentionMes.append(att+ ",");
             		}
             		//Log.v("HelloA", "Attention: " + att + "\n");
             	break;
@@ -246,7 +249,7 @@ public class HelloEEGActivity extends Activity {
             	int Med = msg.arg1;
             	//record the data, while the music is playing
             	if (playing ==true){
-            	MediationMes.append(Med+ " ");
+            	MediationMes.append(Med+ ",");
             	}
             	break;
             case TGDevice.MSG_BLINK:
@@ -282,8 +285,12 @@ public class HelloEEGActivity extends Activity {
 			FileOutputStream outStream=openFileOutput(x+".txt",Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
             
 			//save the data in one stream and the other stream
+			//String AttString = Arrays.toString(A);
+			//outStream.write(AttString.getBytes());
 			
+			String changeRow = "\n";
 			outStream.write(A.getBytes());
+			outStream.write(changeRow.getBytes());
 
             outStream.write(B.getBytes());
             
