@@ -73,6 +73,7 @@ public class HelloEEGActivity extends Activity {
         tv.append("Android version: " + Integer.valueOf(android.os.Build.VERSION.SDK) + "\n" );
         
         fileName = (EditText)findViewById(R.id.editText1);
+       // fileName.setText("Please type in the name of the File");
         //fileName.getText();
        // rawData = (TextView)findViewById(R.id.textView8);
        // rawData.setText("");
@@ -115,7 +116,7 @@ public class HelloEEGActivity extends Activity {
         		save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
 
         		//save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString(),rawDATA.toString());
-        		fileName.setText("");
+        		//fileName.setText("Please type in the name of the File");
 
         		
         	}
@@ -128,7 +129,7 @@ public class HelloEEGActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				button3.setEnabled(false);
+
 				if(bluetoothAdapter == null) {
 		        	// Alert user that Bluetooth is not available
 		        	//Toast.makeText(this, "Bluetooth not available", Toast.LENGTH_LONG).show();
@@ -155,7 +156,8 @@ public class HelloEEGActivity extends Activity {
 		        	tgDevice.start();
 		        	
 		   
-		        }  
+		        }
+				button3.setEnabled(false);
 			}
 		});
 
@@ -280,6 +282,7 @@ public class HelloEEGActivity extends Activity {
 			FileOutputStream outStream=openFileOutput(x+".txt",Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
             
 			//save the data in one stream and the other stream
+			
 			outStream.write(A.getBytes());
 
             outStream.write(B.getBytes());
@@ -301,9 +304,5 @@ public class HelloEEGActivity extends Activity {
             return ;
         }
     }
-
-
-    
- 
 
 }
