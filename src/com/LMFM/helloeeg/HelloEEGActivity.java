@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import android.R.array;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -54,11 +55,14 @@ public class HelloEEGActivity extends Activity {
 	Button b;
 	EditText fileName;
 	String rawDATA = "";
+	array Meddata;
+	array Attdata;
 
 	TGDevice tgDevice;
 	final boolean rawEnabled = false;
 	Boolean playing = false;
-	
+
+
 	//List list=new ArrayList();
 
     public void onCreate(Bundle savedInstanceState) {
@@ -70,22 +74,24 @@ public class HelloEEGActivity extends Activity {
         
         fileName = (EditText)findViewById(R.id.editText1);
         //fileName.getText();
-        rawData = (TextView)findViewById(R.id.textView8);
-        rawData.setText("");
+       // rawData = (TextView)findViewById(R.id.textView8);
+       // rawData.setText("");
+        
+        
         
         AttentionMes = (TextView)findViewById(R.id.textView3);
         AttentionMes.setText("");
         
         MediationMes = (TextView)findViewById(R.id.textView5);
         MediationMes.setText("");   
-        
+        // Play the music
         final MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
         
         final Button button1 = (Button) findViewById(R.id.button1);
         button1.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View v) {
         		//MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
-        		
+        		button1.setEnabled(false);
         		mediaPlayer.start();
         		playing = true;
         		
@@ -98,8 +104,8 @@ public class HelloEEGActivity extends Activity {
         		playing = false;
         		mediaPlayer.pause();
         		//mediaPlayer.seekTo(0);
-        		
-            	
+        		button1.setEnabled(true);
+
         		//int size=list.size(); 
             	//String[] Rawarray=new String[size]; 
             	//for(int i=0;i<list.size();i++){ 
@@ -109,45 +115,55 @@ public class HelloEEGActivity extends Activity {
         		save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
 
         		//save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString(),rawDATA.toString());
-
+        		fileName.setText("");
 
         		
         	}
         });
         
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); 
         
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        final Button button3 = (Button)findViewById(R.id.button3);
+        button3.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				button3.setEnabled(false);
+				if(bluetoothAdapter == null) {
+		        	// Alert user that Bluetooth is not available
+		        	//Toast.makeText(this, "Bluetooth not available", Toast.LENGTH_LONG).show();
+		        	finish();
+		        	return;
+		        }else {
+		        	/*if (bluetoothAdapter.isEnabled()) {
+		        	    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		        	    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+		        	}*/
+		        	/* create the TGDevice */
+		        	/*ArrayAdapter mArrayAdapter = null;
+		        	Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+		        	if (pairedDevices.size()>0){
+		        		for (BluetoothDevice device : pairedDevices){
+		        			mArrayAdapter.add(device.getName() +"\n"+device.getAddress());
+		        		}
+		        	}*/
+		        	tgDevice = new TGDevice(bluetoothAdapter, handler);
+		        	/*if (tgDevice == null){
+		        		tv.append("there ");
+		        	}*/
+		        	tgDevice.connect(true);
+		        	tgDevice.start();
+		        	
+		   
+		        }  
+			}
+		});
+
         //String bluetoothname = bluetoothAdapter.getName();
         
 
         
-        if(bluetoothAdapter == null) {
-        	// Alert user that Bluetooth is not available
-        	Toast.makeText(this, "Bluetooth not available", Toast.LENGTH_LONG).show();
-        	finish();
-        	return;
-        }else {
-        	/*if (bluetoothAdapter.isEnabled()) {
-        	    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        	    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        	}*/
-        	/* create the TGDevice */
-        	/*ArrayAdapter mArrayAdapter = null;
-        	Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        	if (pairedDevices.size()>0){
-        		for (BluetoothDevice device : pairedDevices){
-        			mArrayAdapter.add(device.getName() +"\n"+device.getAddress());
-        		}
-        	}*/
-        	tgDevice = new TGDevice(bluetoothAdapter, handler);
-        	/*if (tgDevice == null){
-        		tv.append("there ");
-        	}*/
-        	tgDevice.connect(true);
-        	tgDevice.start();
-        	
-   
-        }  
+        
     }
     
     @Override
@@ -159,32 +175,42 @@ public class HelloEEGActivity extends Activity {
     /**
      * Handles messages from TGDevice
      */
-    private final Handler handler = new Handler() {
+    public final Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
         	int rawdata;
+        	Button button1 = (Button)findViewById(R.id.button1);
+        	Button button3 = (Button)findViewById(R.id.button3);
 			switch (msg.what) {
             case TGDevice.MSG_STATE_CHANGE:
             	tv.append("get message");
                 switch (msg.arg1) {
 	                case TGDevice.STATE_IDLE:
+	                	//button1.setEnabled(false);
 	                    break;
 	                case TGDevice.STATE_CONNECTING:		                	
 	                	tv.append("Connecting...\n");
+	                	//button1.setEnabled(false);
 	                	break;		                    
 	                case TGDevice.STATE_CONNECTED:
 	                	tv.append("Connected.\n");
+	                	button1.setEnabled(true);
+	                	button3.setEnabled(false);
 	                	tgDevice.start();
 	                    break;
 	                case TGDevice.STATE_NOT_FOUND:
 	                	tv.append("Can't find\n");
+	                	//button1.setEnabled(false);
+	                	button3.setEnabled(true);
 	                	break;
 	                case TGDevice.STATE_NOT_PAIRED:
 	                	tv.append("not paired\n");
+	                	//button1.setEnabled(false);
 	                	break;
 	                case TGDevice.STATE_DISCONNECTED:
 	                	tv.append("Disconnected mang\n");
-	                	
+	                	//button1.setEnabled(false);
+	                	button3.setEnabled(true);
 	                    System.out.println(getFilesDir());
                 }
 
@@ -197,7 +223,7 @@ public class HelloEEGActivity extends Activity {
             case TGDevice.MSG_RAW_DATA:	  
             	rawdata = msg.arg1;
  
-            	rawDATA = rawDATA.concat(msg.arg1+" ");
+            	//rawDATA = rawDATA.concat(msg.arg1+" ");
 
             	//if (playing == true){
             		//rawData.append(msg.arg1+" ");
@@ -208,11 +234,9 @@ public class HelloEEGActivity extends Activity {
                 break;
             case TGDevice.MSG_ATTENTION:
             		int att = msg.arg1;
-            		
-            		//record the data, while the music is playing
-            	
             		if (playing == true){
-            		AttentionMes.append(att+ " ");
+            			//button1.setEnabled(true);
+            			AttentionMes.append(att+ " ");
             		}
             		//Log.v("HelloA", "Attention: " + att + "\n");
             	break;
@@ -253,7 +277,7 @@ public class HelloEEGActivity extends Activity {
     {
         try {
             
-			FileOutputStream outStream=openFileOutput(x,Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
+			FileOutputStream outStream=openFileOutput(x+".txt",Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
             
 			//save the data in one stream and the other stream
 			outStream.write(A.getBytes());
