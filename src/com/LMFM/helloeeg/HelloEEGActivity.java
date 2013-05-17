@@ -63,8 +63,14 @@ public class HelloEEGActivity extends Activity {
 	final boolean rawEnabled = false;
 	Boolean playing = false;
 	
-	int[] AttArray = {44};
-	int[] MedArray;
+	int[] AttArray = {0};
+	int[] MedArray = {0};
+	
+	//ArrayList<String> AttList;
+	//ArrayList<String> MedList;
+	
+	ArrayList<String> AttList= new ArrayList();
+	ArrayList<String> MedList= new ArrayList();
 
 	//List list=new ArrayList();
 
@@ -116,7 +122,8 @@ public class HelloEEGActivity extends Activity {
             	//Rawarray[i]=(String)list.get(i); 
            //} 
             	
-        		save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString());
+        		//save(AttArray, MedArray,fileName.getText().toString());
+        		saveString(AttList, MedList, fileName.getText().toString());
 
         		//save(AttentionMes.getText().toString(), MediationMes.getText().toString(),fileName.getText().toString(),rawDATA.toString());
         		fileName.setText("");
@@ -238,18 +245,34 @@ public class HelloEEGActivity extends Activity {
                 break;
             case TGDevice.MSG_ATTENTION:
             		int att = msg.arg1;
+            		String attString = Integer.toString(att);
             		if (playing == true){
             			//button1.setEnabled(true);
-            			Arrays.fill(AttArray, att);
+            			//Arrays.fill(AttArray, att);
+            			AttList.add(attString);
+            			
+            			//Method for Array
+            			//int lengthArray = AttArray.length;
+            			//int indexAtt = lengthArray;
+            			//AttArray[indexAtt] = att;
+            			
+            			
             			AttentionMes.append(att+ ",");
             		}
             		//Log.v("HelloA", "Attention: " + att + "\n");
             	break;
             case TGDevice.MSG_MEDITATION:
-            	int Med = msg.arg1;
+            	int med = msg.arg1;
+            	String medString = Integer.toString(med);
             	//record the data, while the music is playing
+            	
             	if (playing ==true){
-            	MediationMes.append(Med+ ",");
+            		//Arrays.fill(MedArray, Med);
+            		
+            		MedList.add(medString);
+        			//int lengthArray = MedArray.length;
+        			//AttArray[lengthArray + 1] = Med;
+            		MediationMes.append(med+ ",");
             	}
             	break;
             case TGDevice.MSG_BLINK:
@@ -276,9 +299,74 @@ public class HelloEEGActivity extends Activity {
     	//tgDevice.ena
     }
     
+    public void saveString(ArrayList<String> AttList, ArrayList<String> MedList, String fileName)
+    {
+    	try{
+    		
+			String changeRow = "\n";
+			String comma = ",";
+			
+			String[] mStringAtt = new String[AttList.size()];
+			mStringAtt = AttList.toArray(mStringAtt);
+			String[] mStringMed = new String[MedList.size()];
+			mStringMed = MedList.toArray(mStringMed);
+			
+			//Change the ArrayList to array
+			//Object[] attArray = AttList.toArray();
+			//Object[] medArray = MedList.toArray();
+			
+			//convert the object to string
+			//for (int i=0; i< attArray.length; i++){
+			//	Log.d("the Attention", (String)attArray[i]);
+				
+			//}
+			//for (int i=0; i< medArray.length; i++){
+			//	Log.d("the mediation", (String)medArray[i]);
+				
+			//}
+
+			//String attString = attArray.toString();
+			//String medString = medArray.toString();
+			
+			//String[] attArrayString=Arrays.copyOf(attArray, attArray.length, String[].class);
+			FileOutputStream outStream=openFileOutput(fileName+".txt",Activity.MODE_WORLD_WRITEABLE+Activity.MODE_WORLD_READABLE);
+			
+			
+			//outStream.write(AttList.getBytes());
+			//outStream.write(attString.getBytes());
+			//outStream.write(changeRow.getBytes());
+			//outStream.write(medString.getBytes());
+            //outStream.write(MedList.getBytes());
+			
+			for (int i = 0; i<mStringAtt.length; i++){
+				String attData = mStringAtt[i];
+				String medData = mStringMed[i];
+				
+				outStream.write(attData.getBytes());
+				
+				outStream.write(comma.getBytes());
+				
+				outStream.write(medData.getBytes());
+				
+				outStream.write(changeRow.getBytes());
+				
+			}
+    	}
+    	catch (FileNotFoundException e) {
+        
+    		return;
+        }
+    
+    	catch (IOException e){
+        
+    		return ;
+    
+    	}
+    }
+    
     // Save the data in text file
     // public void save(String A, String B, String x, String r)
-    public void save(String A, String B, String x)
+    public void save(int[] A, int[]B, String x)
     {
         try {
             
@@ -287,12 +375,25 @@ public class HelloEEGActivity extends Activity {
 			//save the data in one stream and the other stream
 			//String AttString = Arrays.toString(A);
 			//outStream.write(AttString.getBytes());
-			
+			int lenArray = A.length;
 			String changeRow = "\n";
-			outStream.write(A.getBytes());
-			outStream.write(changeRow.getBytes());
+			String comma = ",";
+			//int[][] CollectedData = {};
+			//for (int i = 0; i < lenArray;i++){
 
-            outStream.write(B.getBytes());
+			//		CollectedData [i][0] = A[i];
+			//		CollectedData [i][1] = B[i];
+			//		String AttString = A[i].toString();
+			//		String MedString = Arrays.toString(B[i]);
+			//		outStream.write();
+
+			//}
+			
+			String AttString = Arrays.toString(A);
+			String MedString = Arrays.toString(B);
+			outStream.write(AttString.getBytes());
+			outStream.write(changeRow.getBytes());
+            outStream.write(MedString.getBytes());
             
           //  outStream.write(r.getBytes());
            // int size=length(rawdata);  
