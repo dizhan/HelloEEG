@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,12 +100,21 @@ public class HelloEEGActivity extends Activity {
         final MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
         
         final Button button1 = (Button) findViewById(R.id.button1);
+        button1.setEnabled(false);
+        
         button1.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View v) {
         		//MediaPlayer mediaPlayer = MediaPlayer.create(HelloEEGActivity.this, R.raw.seagull);
         		button1.setEnabled(false);
         		mediaPlayer.start();
+    			long yourmilliseconds = System.currentTimeMillis();
+    	        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
+
+    	        Date resultdate = new Date(yourmilliseconds);
+    	        System.out.println(sdf.format(resultdate));
+
         		playing = true;
+        		
         		
         	}
         });
@@ -113,7 +124,8 @@ public class HelloEEGActivity extends Activity {
         	public void onClick(View v) {
         		playing = false;
         		mediaPlayer.pause();
-        		//mediaPlayer.seekTo(0);
+        		mediaPlayer.seekTo(0);
+        		
         		button1.setEnabled(true);
 
         		//int size=list.size(); 
@@ -205,7 +217,7 @@ public class HelloEEGActivity extends Activity {
 	                	break;		                    
 	                case TGDevice.STATE_CONNECTED:
 	                	tv.append("Connected.\n");
-	                	button1.setEnabled(true);
+	                	//button1.setEnabled(true);
 	                	button3.setEnabled(false);
 	                	tgDevice.start();
 	                    break;
@@ -246,7 +258,9 @@ public class HelloEEGActivity extends Activity {
             case TGDevice.MSG_ATTENTION:
             		int att = msg.arg1;
             		String attString = Integer.toString(att);
-            		if (playing == true){
+            		if (att >0){
+            			button1.setEnabled(true);
+            			if (playing == true){
             			//button1.setEnabled(true);
             			//Arrays.fill(AttArray, att);
             			AttList.add(attString);
@@ -258,6 +272,18 @@ public class HelloEEGActivity extends Activity {
             			
             			
             			AttentionMes.append(att+ ",");
+            			long yourmilliseconds = System.currentTimeMillis();
+            	        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
+
+            	        Date resultdate = new Date(yourmilliseconds);
+            	        System.out.println(sdf.format(resultdate));
+
+            		    }
+            			
+            		}
+            		else{
+            			button1.setEnabled(false);
+            			
             		}
             		//Log.v("HelloA", "Attention: " + att + "\n");
             	break;
@@ -265,6 +291,8 @@ public class HelloEEGActivity extends Activity {
             	int med = msg.arg1;
             	String medString = Integer.toString(med);
             	//record the data, while the music is playing
+            	if (med >0){
+            		button1.setEnabled(true);
             	
             	if (playing ==true){
             		//Arrays.fill(MedArray, Med);
@@ -273,6 +301,16 @@ public class HelloEEGActivity extends Activity {
         			//int lengthArray = MedArray.length;
         			//AttArray[lengthArray + 1] = Med;
             		MediationMes.append(med+ ",");
+        			long yourmilliseconds = System.currentTimeMillis();
+        	        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
+
+        	        Date resultdate = new Date(yourmilliseconds);
+        	        System.out.println(sdf.format(resultdate));
+
+            	}
+            	}
+            	else{
+            		button1.setEnabled(false);
             	}
             	break;
             case TGDevice.MSG_BLINK:
@@ -349,6 +387,11 @@ public class HelloEEGActivity extends Activity {
 				outStream.write(medData.getBytes());
 				
 				outStream.write(changeRow.getBytes());
+				
+
+				Log.d("the Attention", (String)mStringAtt[i]);
+
+				Log.d("the Mediation", (String)mStringMed[i]);
 				
 			}
     	}
